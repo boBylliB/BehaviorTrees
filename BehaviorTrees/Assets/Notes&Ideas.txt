@@ -1,0 +1,26 @@
+Pull tasks from an xml document
+Children of xml nodes are the children of that task
+Game objects intended to be interfaced by tasks need a "TaskInterface" class
+- Will have a dictionary called "conditions" that uses string keys to get boolean values
+- Will have a dictionary called "actions" that has a dictionary containing function references
+  - These functions should return a boolean value corresponding to success or failure, and have no inputs
+  - Specifically, "Func<bool>"
+All tasks can be "inverted" with the "invert" entry
+
+=== Types of tasks ===
+Sequence
+- Same idea as Millington
+- Has children
+- No extra parameters
+Selector
+- Same idea as Millington
+- Has children
+- No extra parameters
+Conditional
+- Evaluates a condition
+- No children
+- Needs the name of the gameobject to check and the name of a key to use for a dictionary check with the associated TaskCondition
+Action
+- Calls a function to interact with something
+- No children
+- Needs the name of the gameobject to interact with and the name of the action to perform

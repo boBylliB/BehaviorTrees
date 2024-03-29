@@ -1,0 +1,21 @@
+<tasks>
+  <selector>
+    <sequence>
+      <conditional gameobject="Door" condition="open"/>
+      <action gameobject="BruceBanner" action="moveIntoRoom"/>
+    </sequence>
+    <sequence>
+      <action gameobject="BruceBanner" action="moveToDoor"/>
+      <selector>
+        <sequence>
+          <conditional gameobject="Door" condition="locked" invert="True"/>
+          <action gameobject="Door" action="open"/>
+        </sequence>
+        <sequence>
+          <action gameobject="Door" action="barge"/>
+        </sequence>
+      </selector>
+      <action gameobject="BruceBanner" action="moveIntoRoom"/>
+    </sequence>
+  </selector>
+</tasks>
