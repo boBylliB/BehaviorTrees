@@ -24,3 +24,11 @@ Action
 - Calls a function to interact with something
 - No children
 - Needs the name of the gameobject to interact with and the name of the action to perform
+
+=== Task Editor ===
+Tasks are represented by little icons connected by arrows
+Each icon has a symbol/shape for the type, a name, and an edit button
+Clicking the edit button 
+UI is a scrollable background
+- Size is set to the smallest possible bounding box, plus some preset buffer
+- If the size is smaller than the scroll panel, then the content is centered

@@ -5,7 +5,27 @@ using UnityEngine;
 
 public abstract class Task
 {
+    public enum TaskType
+    {
+        Selector, Sequence, Conditional, Action
+    }
+
     public abstract bool run();
+
+    protected int eventID;
+    const string EVENT_NAME_PREFIX = "FinishedTask";
+    public string TaskFinished
+    {
+        get
+        {
+            return EVENT_NAME_PREFIX + eventID;
+        }
+    }
+    public Task()
+    {
+        // NOTE: Potentially might be better to use an enum for success/fail/running instead of an event bus
+        eventID = EventBus.GetEventID();
+    }
 }
 
 public class Selector : Task
@@ -69,5 +89,21 @@ public class Action : Task
         if (!target.actions.TryGetValue(key, out output))
             return !invert;
         return !invert ? output() : !output();
+    }
+}
+
+public class Wait : Task
+{
+    float mTimeToWait;
+
+    public Wait(float time)
+    {
+        mTimeToWait = time;
+    }
+
+    public override bool run()
+    {
+        EventBus.ScheduleTrigger(TaskFinished, mTimeToWait);
+        return true;
     }
 }
