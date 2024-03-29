@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BruceBanner : Kinematic
 {
@@ -32,6 +33,8 @@ public class BruceBanner : Kinematic
             running = true;
             taskList.run();
         }
+        if (Input.GetKeyDown("r"))
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         steeringUpdate = new SteeringOutput();
         steeringUpdate.linear = myMoveType.getSteering().linear;
         base.Update();
