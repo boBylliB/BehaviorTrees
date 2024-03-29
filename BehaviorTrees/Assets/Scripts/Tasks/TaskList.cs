@@ -19,6 +19,14 @@ public class TaskList : MonoBehaviour
         }
     }
 
+    public void run()
+    {
+        foreach (Task task in tasks)
+        {
+            task.run();
+        }
+    }
+
     private Task readTask(XElement xelem)
     {
         if (xelem.Name == "sequence")
@@ -50,7 +58,7 @@ public class TaskList : MonoBehaviour
         {
             Action act = new Action();
             act.invert = xelem.Get("invert", false);
-            act.key = xelem.Get<string>("condition");
+            act.key = xelem.Get<string>("action");
             act.target = GameObject.Find(xelem.Get<string>("gameobject")).GetComponent<TaskInterface>();
             return act;
         }

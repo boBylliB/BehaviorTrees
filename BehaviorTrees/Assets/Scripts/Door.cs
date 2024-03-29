@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,9 @@ public class Door : MonoBehaviour
 
     public Vector3 forceDirection;
     public float forceValue;
+
+    public Material lockedMaterial;
+    public Material unlockedMaterial;
 
     public GameObject openObject;
     public GameObject closedObject;
@@ -43,6 +47,8 @@ public class Door : MonoBehaviour
         {
             locked = value;
             taskInterface.conditions["locked"] = locked;
+            openObject.GetComponent<Renderer>().material = locked ? lockedMaterial : unlockedMaterial;
+            closedObject.GetComponent<Renderer>().material = locked ? lockedMaterial : unlockedMaterial;
         }
     }
     public bool sendFlying()
@@ -60,5 +66,13 @@ public class Door : MonoBehaviour
     {
         setOpen(true);
         return open;
+    }
+    public void toggleOpen()
+    {
+        setOpen(!open);
+    }
+    public void toggleLocked()
+    {
+        setLocked(!locked);
     }
 }

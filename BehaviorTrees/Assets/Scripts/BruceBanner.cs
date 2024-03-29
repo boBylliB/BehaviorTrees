@@ -8,7 +8,10 @@ public class BruceBanner : Kinematic
     public GameObject exterior;
     public GameObject frontOfDoor;
 
+    public TaskList taskList;
     public TaskInterface taskInterface;
+
+    public bool running = false;
 
     protected Arrive myMoveType;
 
@@ -24,6 +27,11 @@ public class BruceBanner : Kinematic
     }
     protected override void Update()
     {
+        if (!running && Input.GetKeyDown("g"))
+        {
+            running = true;
+            taskList.run();
+        }
         steeringUpdate = new SteeringOutput();
         steeringUpdate.linear = myMoveType.getSteering().linear;
         base.Update();
