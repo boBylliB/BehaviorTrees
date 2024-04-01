@@ -16,6 +16,7 @@ public class TaskBlock : MonoBehaviour
     public string condition;
     public string action;
 
+    public TaskBlock parent = null;
     public List<TaskBlock> children;
 
     public Text typeLabel;
@@ -30,11 +31,19 @@ public class TaskBlock : MonoBehaviour
 
     public UIManager um;
     public List<Arrow> arrows;
-
+    public int temporaryLayer = 3;
+    
     private bool initialized = false;
+    private bool arrowsOutOfDate = false;
+    private Vector2 mouseOffset;
+    private bool selected = false;
+    private Arrow tempArrow;
+    private bool movingArrow = false;
 
     public void Initialize(int taskID, Task.TaskType taskType, bool inverted, string kinematic, string target, string condition, string action, List<TaskBlock> children)
     {
+        this.um = FindObjectOfType<UIManager>();
+
         this.taskID = taskID;
         this.taskType = taskType;
         this.inverted = inverted;
@@ -54,6 +63,8 @@ public class TaskBlock : MonoBehaviour
                 conditionDropdown.gameObject.SetActive(false);
                 actionDropdown.gameObject.SetActive(false);
                 childrenBox.gameObject.SetActive(true);
+
+                arrowsOutOfDate = true;
                 break;
             case Task.TaskType.Sequence:
                 typeLabel.text = "Sequence";
@@ -62,6 +73,8 @@ public class TaskBlock : MonoBehaviour
                 conditionDropdown.gameObject.SetActive(false);
                 actionDropdown.gameObject.SetActive(false);
                 childrenBox.gameObject.SetActive(true);
+
+                arrowsOutOfDate = true;
                 break;
             case Task.TaskType.Conditional:
                 typeLabel.text = "Conditional";
@@ -103,9 +116,60 @@ public class TaskBlock : MonoBehaviour
 
     public void Update()
     {
-        if (!initialized) return;
+        if (!initialized || !um.editing) return;
 
+        if (arrowsOutOfDate)
+            updateArrows();
+        checkForSelect();
 
+        if (selected)
+        {
+            if (transform.position != Input.mousePosition + (Vector3)mouseOffset)
+            {
+                arrowsOutOfDate = true;
+                if (parent != null)
+                    parent.arrowsOutOfDate = true;
+            }
+            transform.position = (Vector2)Input.mousePosition + mouseOffset;
+            if (Input.GetMouseButtonUp(0))
+                selected = false;
+        }
+        else if (movingArrow)
+        {
+            tempArrow.setPoints(transform.position, Input.mousePosition);
+            if (Input.GetMouseButtonUp(0))
+            {
+                movingArrow = false;
+                Destroy(tempArrow);
+                if (um.selectedBlock != null)
+                    children.Add(um.selectedBlock);
+            }
+        }
+    }
+    
+    public void triggerSelect()
+    {
+        if (childrenBox.OverlapPoint(Input.mousePosition))
+        {
+            movingArrow = true;
+            tempArrow = um.createArrow();
+        }
+        else
+        {
+            selected = true;
+            mouseOffset = Input.mousePosition - transform.position;
+        }
+    }
+    public void checkForSelect()
+    {
+        if (this.GetComponent<BoxCollider2D>().OverlapPoint(Input.mousePosition) && !um.selectedBlocks.Contains(this))
+        {
+            um.addToSelectedBlocks(this);
+        }
+        else if (!this.GetComponent<BoxCollider2D>().OverlapPoint(Input.mousePosition) && um.selectedBlocks.Contains(this))
+        {
+            um.removeFromSelectedBlocks(this);
+        }
     }
 
     public void kinematicSelect()
@@ -126,11 +190,43 @@ public class TaskBlock : MonoBehaviour
         action = actionDropdown.options[actionDropdown.value].text;
     }
 
-    private void createArrow(TaskBlock target)
+    private void updateArrows()
     {
-        Arrow arrow = um.createArrow();
-        // Raycast to target to get exact end point
-        //arrow.setPoints(childrenBox.transform.position, );
+        while (arrows.Count > children.Count)
+            arrows.RemoveAt(arrows.Count - 1);
+        while (arrows.Count < children.Count)
+            arrows.Add(um.createArrow());
+        arrowsOutOfDate = false;
+        for (int idx = 0; idx < children.Count; idx++)
+        {
+            arrows[idx].setPoints(transform.position, calculateTargetBlockIntersect(children[idx]));
+        }
+    }
+    private Vector2 calculateTargetBlockIntersect(TaskBlock target)
+    {
+        float left = target.transform.position.x - um.taskBlockWidth * 0.5f;
+        float top = target.transform.position.y + um.taskBlockHeight * 0.5f;
+        float right = left + um.taskBlockWidth;
+        float bottom = top - um.taskBlockHeight;
+
+        float x = Mathf.Clamp(transform.position.x, left, right);
+        float y = Mathf.Clamp(transform.position.y, bottom, top);
+
+        float dl = Mathf.Abs(x - left);
+        float dr = Mathf.Abs(x - right);
+        float dt = Mathf.Abs(y - top);
+        float db = Mathf.Abs(y - bottom);
+
+        float m = Mathf.Min(dl, dr, dt, db);
+
+        if (m == dt)
+            return new Vector2((left + right) / 2, top);
+        else if (m == db)
+            return new Vector2((left + right) / 2, bottom);
+        else if (m == dl)
+            return new Vector2(left, (top + bottom) / 2);
+        else
+            return new Vector2(right, (top + bottom) / 2);
     }
 
     private void fillKinematicOptions()

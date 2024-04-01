@@ -1368,13 +1368,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sourceTaskList: {fileID: 248725932}
-  taskBlockHeight: 320
-  taskBlockWidth: 320
+  taskBlockHeight: 200
+  verticalBuffer: 120
+  taskBlockWidth: 300
+  horizontalBuffer: 20
   taskBlockPrefab: {fileID: 883779281182170318, guid: 688c0b2ca45f1e24fab7cefe9c0c9b41, type: 3}
   taskBlockParent: {fileID: 144647816}
   taskBlocks: []
-  arrowPrefab: {fileID: 0}
-  arrowParent: {fileID: 0}
+  arrowPrefab: {fileID: 2899082875030500620, guid: e4eb16a97138eb748b170cf62bcfd8f2, type: 3}
+  arrowParent: {fileID: 144647816}
   selectedBlocks: []
   editing: 0
   runtimeUI:
@@ -1383,6 +1385,8 @@ MonoBehaviour:
   - {fileID: 466467200}
   editorUI:
   - {fileID: 1345548663}
+  selectedBlock: {fileID: 0}
+  scrollView: {fileID: 1345548665}
 --- !u!4 &1044602014
 Transform:
   m_ObjectHideFlags: 0

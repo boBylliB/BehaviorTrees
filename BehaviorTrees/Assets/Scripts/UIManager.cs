@@ -9,8 +9,10 @@ public class UIManager : MonoBehaviour
 {
     public TaskList sourceTaskList;
 
-    public float taskBlockHeight = 100f;
-    public float taskBlockWidth = 100f;
+    public float taskBlockHeight = 200f;
+    public float verticalBuffer = 120f;
+    public float taskBlockWidth = 300f;
+    public float horizontalBuffer = 20f;
 
     public GameObject taskBlockPrefab;
     public GameObject taskBlockParent;
@@ -26,7 +28,10 @@ public class UIManager : MonoBehaviour
     public List<GameObject> runtimeUI;
     public List<GameObject> editorUI;
 
-    private int selectedBlockID = -1;
+    public TaskBlock selectedBlock = null;
+
+    public ScrollRect scrollView;
+
     private int taskBlockID = 0;
 
     private List<List<TaskBlock>> initialTaskBlockLayout;
@@ -46,18 +51,45 @@ public class UIManager : MonoBehaviour
         if (editing)
         {
             // Check for selected task blocks
-            //checkForSelect();
+            selectBlock();
             if (Input.GetMouseButtonDown(0))
             {
-                if (selectedBlockID > -1)
+                if (selectedBlock != null)
                 {
+                    scrollView.enabled = false;
                     // Tell the correct task block that it was selected and clicked
                     // This may mean the block has to move, or it may mean the children box was clicked,
                     // but that specific logic is handled by the block itself
-                    //selectBlock();
+                    triggerBlockSelect();
                 }
             }
+            if (Input.GetMouseButtonUp(0))
+                scrollView.enabled = true;
         }
+    }
+
+    public void addToSelectedBlocks(TaskBlock block)
+    {
+        selectedBlocks.Add(block);
+    }
+    public void removeFromSelectedBlocks(TaskBlock block)
+    {
+        selectedBlocks.Remove(block);
+    }
+    public void selectBlock()
+    {
+        selectedBlock = null;
+        foreach (TaskBlock current in selectedBlocks)
+        {
+            if (selectedBlock == null || current.taskID > selectedBlock.taskID)
+            {
+                selectedBlock = current;
+            }
+        }
+    }
+    private void triggerBlockSelect()
+    {
+        selectedBlock.triggerSelect();
     }
 
     public void toggleEditor()
@@ -84,12 +116,12 @@ public class UIManager : MonoBehaviour
             {
                 case Task.TaskType.Selector:
                     Selector sel = task as Selector;
-                    children.AddRange(createChildTaskBlocks(sel, 1));
+                    children.AddRange(createChildTaskBlocks(sel, 1, taskBlock));
                     taskBlock.Initialize(taskBlockID++, sel.type, sel.invert, null, null, null, null, children);
                     break;
                 case Task.TaskType.Sequence:
                     Sequence seq = task as Sequence;
-                    children.AddRange(createChildTaskBlocks(seq, 1));
+                    children.AddRange(createChildTaskBlocks(seq, 1, taskBlock));
                     taskBlock.Initialize(taskBlockID++, seq.type, seq.invert, null, null, null, null, children);
                     break;
                 case Task.TaskType.Conditional:
@@ -116,21 +148,22 @@ public class UIManager : MonoBehaviour
         int height = initialTaskBlockLayout.Count;
         List<int> widths = new List<int>();
         int maxWidth = 0;
-        foreach (List<TaskBlock> taskBlockList in initialTaskBlockLayout) {
+        foreach (List<TaskBlock> taskBlockList in initialTaskBlockLayout)
+        {
             widths.Add(taskBlockList.Count);
             if (taskBlockList.Count > maxWidth) maxWidth = taskBlockList.Count;
         }
         // Set bounding box
-        taskBlockParent.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxWidth * taskBlockWidth);
-        taskBlockParent.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (height + 1) * taskBlockHeight);
+        taskBlockParent.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxWidth * (taskBlockWidth + horizontalBuffer));
+        taskBlockParent.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, (height + 1) * (taskBlockHeight + verticalBuffer));
         // Set spacing
         for (int row = 0; row < height; row++)
         {
             int width = widths[row];
             for (int col = 0; col < width; col++)
             {
-                float xPlacement = ((maxWidth + 0.5f) * taskBlockWidth / 2) - taskBlockWidth * (((width - 1) / 2 - col) + 0.5f * ((width - 1) % 2));
-                float yPlacement = ((height) * taskBlockHeight / 2) - row * taskBlockHeight;
+                float xPlacement = ((maxWidth + 0.5f) * (taskBlockWidth + horizontalBuffer) / 2) - (taskBlockWidth + horizontalBuffer) * (((width - 1) / 2 - col) + 0.5f * ((width - 1) % 2));
+                float yPlacement = ((height) * (taskBlockHeight + verticalBuffer) / 2) - row * (taskBlockHeight + verticalBuffer);
                 initialTaskBlockLayout[row][col].transform.position = new Vector3(xPlacement, yPlacement);
             }
         }
@@ -142,13 +175,14 @@ public class UIManager : MonoBehaviour
         return arrowObject.GetComponent<Arrow>();
     }
 
-    private List<TaskBlock> createChildTaskBlocks(Selector parent, int level)
+    private List<TaskBlock> createChildTaskBlocks(Selector parent, int level, TaskBlock parentBlock)
     {
         List<TaskBlock> output = new List<TaskBlock>();
         if (initialTaskBlockLayout.Count < level + 1) initialTaskBlockLayout.Add(new List<TaskBlock>());
         foreach (Task task in parent.children)
         {
             TaskBlock taskBlock = Object.Instantiate(taskBlockPrefab, taskBlockParent.transform).GetComponent<TaskBlock>();
+            taskBlock.parent = parentBlock;
             output.Add(taskBlock);
             taskBlocks.Add(taskBlock);
             initialTaskBlockLayout[level].Add(taskBlock);
@@ -157,12 +191,12 @@ public class UIManager : MonoBehaviour
             {
                 case Task.TaskType.Selector:
                     Selector sel = task as Selector;
-                    children.AddRange(createChildTaskBlocks(sel, level + 1));
+                    children.AddRange(createChildTaskBlocks(sel, level + 1, taskBlock));
                     taskBlock.Initialize(taskBlockID++, sel.type, sel.invert, null, null, null, null, children);
                     break;
                 case Task.TaskType.Sequence:
                     Sequence seq = task as Sequence;
-                    children.AddRange(createChildTaskBlocks(seq, level + 1));
+                    children.AddRange(createChildTaskBlocks(seq, level + 1, taskBlock));
                     taskBlock.Initialize(taskBlockID++, seq.type, seq.invert, null, null, null, null, children);
                     break;
                 case Task.TaskType.Conditional:
@@ -181,13 +215,14 @@ public class UIManager : MonoBehaviour
         }
         return output;
     }
-    private List<TaskBlock> createChildTaskBlocks(Sequence parent, int level)
+    private List<TaskBlock> createChildTaskBlocks(Sequence parent, int level, TaskBlock parentBlock)
     {
         List<TaskBlock> output = new List<TaskBlock>();
         if (initialTaskBlockLayout.Count < level + 1) initialTaskBlockLayout.Add(new List<TaskBlock>());
         foreach (Task task in parent.children)
         {
             TaskBlock taskBlock = Object.Instantiate(taskBlockPrefab, taskBlockParent.transform).GetComponent<TaskBlock>();
+            taskBlock.parent = parentBlock;
             output.Add(taskBlock);
             taskBlocks.Add(taskBlock);
             initialTaskBlockLayout[level].Add(taskBlock);
@@ -196,12 +231,12 @@ public class UIManager : MonoBehaviour
             {
                 case Task.TaskType.Selector:
                     Selector sel = task as Selector;
-                    children.AddRange(createChildTaskBlocks(sel, level + 1));
+                    children.AddRange(createChildTaskBlocks(sel, level + 1, taskBlock));
                     taskBlock.Initialize(taskBlockID++, sel.type, sel.invert, null, null, null, null, children);
                     break;
                 case Task.TaskType.Sequence:
                     Sequence seq = task as Sequence;
-                    children.AddRange(createChildTaskBlocks(seq, level + 1));
+                    children.AddRange(createChildTaskBlocks(seq, level + 1, taskBlock));
                     taskBlock.Initialize(taskBlockID++, seq.type, seq.invert, null, null, null, null, children);
                     break;
                 case Task.TaskType.Conditional:

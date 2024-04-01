@@ -12,12 +12,6 @@ public class Arrow : MonoBehaviour
     private Vector2 startPos;
     private Vector2 endPos;
 
-    private void Update()
-    {
-        Vector3 mousePos = Input.mousePosition;
-        setPoints(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f), mousePos);
-    }
-
     public void setPoints(Vector2 startPos, Vector2 endPos)
     {
         if (startPos != null)
@@ -36,5 +30,6 @@ public class Arrow : MonoBehaviour
         line.transform.position = (endPos - endOffset + startPos) / 2;
         line.transform.localScale = new Vector3(lineWidthScale, Vector3.Distance(endPos - endOffset, startPos) / arrowheadHeight);
         line.transform.eulerAngles = new Vector3(0, 0, angle * 180 / Mathf.PI);
+        transform.SetAsFirstSibling();
     }
 }
