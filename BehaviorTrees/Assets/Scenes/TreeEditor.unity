@@ -473,6 +473,71 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 486559714}
   m_CullTransparentMesh: 1
+--- !u!1 &799196468
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 799196469}
+  - component: {fileID: 799196471}
+  - component: {fileID: 799196470}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &799196469
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799196468}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &799196470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799196468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 739e67e3449325a4c8738f89d36d26dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  taskFile: {fileID: 4900000, guid: 634e64600e973504c95cece52f579bdd, type: 3}
+--- !u!114 &799196471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799196468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdcf4aa3ba99ad241b4c754f6b357bde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sourceTaskList: {fileID: 799196470}
+  taskBlockHeight: 320
+  taskBlockWidth: 220
+  startingHeight: 860
+  taskBlockPrefab: {fileID: 883779281182170318, guid: 688c0b2ca45f1e24fab7cefe9c0c9b41, type: 3}
+  taskBlockParent: {fileID: 1349137212}
+  taskBlocks: []
+  selectedBlocks: []
 --- !u!1 &894609567
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,12 @@
+<sceneinfo>
+	<interactable gameobject="BruceBanner" taskinterface="True" kinematic="True"/>
+	<interactable gameobject="Door" taskinterface="True">
+		<condition name="open"/>
+		<condition name="locked"/>
+		<action name="open"/>
+		<action name="barge"/>
+	</interactable>
+	<target gameobject="Interior"/>
+	<target gameobject="Exterior"/>
+	<target gameobject="FrontOfDoor"/>
+</sceneinfo>

@@ -14,6 +14,8 @@ public class BruceBanner : Kinematic
 
     public bool running = false;
 
+    public UIManager um;
+
     protected Arrive myMoveType;
 
     private void Start()
@@ -33,12 +35,12 @@ public class BruceBanner : Kinematic
         if (myTarget != myMoveType.target)
             myMoveType.target = myTarget;
 
-        if (!running && Input.GetKeyDown("g"))
+        if (!running && !um.editing && Input.GetKeyDown("g"))
         {
             running = true;
             taskList.run();
         }
-        if (Input.GetKeyDown("r"))
+        if (!um.editing && Input.GetKeyDown("r"))
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         steeringUpdate = new SteeringOutput();
         steeringUpdate.linear = myMoveType.getSteering().linear;

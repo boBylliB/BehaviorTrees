@@ -7,8 +7,11 @@ public abstract class Task
 {
     public enum TaskType
     {
-        Selector, Sequence, Conditional, Action
+        Selector, Sequence, Conditional, Action, Movement, // Public-facing tasks
+        Wait, WaitUntil, Evaluate                          // Internal utility tasks
     }
+    public TaskType type;
+    public bool invert;
 
     public abstract void run();
     public bool succeeded;
@@ -32,7 +35,6 @@ public abstract class Task
 public class Selector : Task
 {
     public List<Task> children;
-    public bool invert;
 
     private Task currentTask;
     private int taskIdx;
@@ -41,6 +43,7 @@ public class Selector : Task
     {
         children = taskList;
         this.invert = invert;
+        type = TaskType.Selector;
     }
 
     public override void run()
@@ -75,7 +78,6 @@ public class Selector : Task
 public class Sequence : Task
 {
     public List<Task> children;
-    public bool invert;
 
     private Task currentTask;
     private int taskIdx;
@@ -84,6 +86,7 @@ public class Sequence : Task
     {
         children = taskList;
         this.invert = invert;
+        type = TaskType.Sequence;
     }
 
     public override void run()
@@ -119,7 +122,6 @@ public class Conditional : Task
 {
     public TaskInterface target;
     public string key;
-    public bool invert;
     public bool defaultValue;
 
     public Conditional(TaskInterface target, string key, bool invert = false, bool defaultValue = false)
@@ -128,6 +130,7 @@ public class Conditional : Task
         this.key = key;
         this.defaultValue = defaultValue;
         this.invert = invert;
+        type = TaskType.Conditional;
     }
 
     public override void run()
@@ -145,13 +148,13 @@ public class Action : Task
 {
     public TaskInterface target;
     public string key;
-    public bool invert;
 
     public Action(TaskInterface target, string key, bool invert = false)
     {
         this.target = target;
         this.key = key;
         this.invert = invert;
+        type = TaskType.Action;
     }
 
     public override void run()
@@ -171,7 +174,6 @@ public class Movement : Task
     public Kinematic focus;
     public GameObject goal;
     public float threshold;
-    public bool invert;
     public float checkDelay;
     public float timeout;
 
@@ -185,6 +187,7 @@ public class Movement : Task
         this.threshold = threshold;
         this.checkDelay = checkDelay;
         this.timeout = timeout;
+        type = TaskType.Movement;
     }
 
     public override void run()
@@ -222,6 +225,7 @@ public class Wait : Task
     public Wait(float time)
     {
         mTimeToWait = time;
+        type = TaskType.Wait;
     }
 
     public override void run()
@@ -235,7 +239,6 @@ public class WaitUntil<T> : Task
 {
     // This waits until the "comparison" function returns the desired result (true, or false if inverted)
     public float timeout;
-    public bool invert;
 
     private Evaluate<T> subTask;
     private Wait delayTask;
@@ -250,6 +253,7 @@ public class WaitUntil<T> : Task
         this.invert = invert;
         delayTask = new Wait(checkDelay > minDelay ? checkDelay : minDelay);
         this.timeout = timeout;
+        type = TaskType.WaitUntil;
     }
 
     public override void run()
@@ -289,7 +293,6 @@ public class Evaluate<T> : Task
     // Returns the value of the "comparison" function when passed the two given inputs
     public T focus;
     public T target;
-    public bool invert;
     public Func<T, T, bool> comparison;
 
     public Evaluate(T valueToCheck, T goalValue, Func<T, T, bool> comparison, bool invert = false)
@@ -298,6 +301,7 @@ public class Evaluate<T> : Task
         target = goalValue;
         this.comparison = comparison;
         this.invert = invert;
+        type = TaskType.Evaluate;
     }
 
     public override void run()
