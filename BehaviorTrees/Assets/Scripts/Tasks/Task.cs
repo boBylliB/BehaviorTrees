@@ -200,7 +200,10 @@ public class Movement : Task
 
     public bool checkThreshold(GameObject focus, GameObject target)
     {
-        return Vector3.Distance(focus.transform.position, target.transform.position) <= threshold;
+        if (focus && target)
+            return Vector3.Distance(focus.transform.position, target.transform.position) <= threshold;
+        else
+            return false;
     }
 
     public void OnSubTaskFinished()

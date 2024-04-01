@@ -142,7 +142,12 @@ public class TaskBlock : MonoBehaviour
                 movingArrow = false;
                 Destroy(tempArrow);
                 if (um.selectedBlock != null)
-                    children.Add(um.selectedBlock);
+                {
+                    if (children.Contains(um.selectedBlock))
+                        children.Remove(um.selectedBlock);
+                    else
+                        children.Add(um.selectedBlock);
+                }
             }
         }
     }

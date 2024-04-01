@@ -99,6 +99,63 @@ public class UIManager : MonoBehaviour
             UIElement.SetActive(!editing);
         foreach (GameObject UIElement in editorUI)
             UIElement.SetActive(editing);
+
+        if (!editing)
+            outputTasks();
+    }
+    public void outputTasks()
+    {
+        // Now we do the opposite of startup, and rebuild the xml file from our current editor state
+        List<TaskBlock> used = new List<TaskBlock>();
+        sourceTaskList.tasks.Clear();
+        foreach (TaskBlock block in taskBlocks)
+        {
+            if (used.Contains(block))
+                continue;
+
+            sourceTaskList.tasks.Add(convertBlockToTask(block, used));
+            used.Add(block);
+        }
+    }
+    private Task convertBlockToTask(TaskBlock block, List<TaskBlock> used)
+    {
+        List<Task> children;
+        switch (block.taskType)
+        {
+            case Task.TaskType.Selector:
+                children = new List<Task>();
+                foreach (TaskBlock childBlock in block.children)
+                {
+                    children.Add(convertBlockToTask(childBlock, used));
+                    used.Add(childBlock);
+                }
+                Selector sel = new Selector(children, block.inverted);
+                return sel;
+            case Task.TaskType.Sequence:
+                children = new List<Task>();
+                foreach (TaskBlock childBlock in block.children)
+                {
+                    children.Add(convertBlockToTask(childBlock, used));
+                    used.Add(childBlock);
+                }
+                Sequence seq = new Sequence(children, block.inverted);
+                return seq;
+            case Task.TaskType.Conditional:
+                Conditional con = new Conditional(GameObject.Find(block.target).GetComponent<TaskInterface>(),
+                                              block.condition, block.inverted, false);
+                return con;
+            case Task.TaskType.Action:
+                Action act = new Action(GameObject.Find(block.target).GetComponent<TaskInterface>(),
+                                    block.action, block.inverted);
+                return act;
+            case Task.TaskType.Movement:
+                Movement mov = new Movement(GameObject.Find(block.kinematic).GetComponent<Kinematic>(),
+                                        GameObject.Find(block.target), block.inverted,
+                                        1.5f, 0.1f, 10f);
+                return mov;
+            default:
+                throw new KeyNotFoundException($"Could not find task type {block.taskType}");
+        }
     }
 
     public void getTasks()
