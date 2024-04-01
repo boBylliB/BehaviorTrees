@@ -16,6 +16,9 @@ public class UIManager : MonoBehaviour
     public GameObject taskBlockParent;
     public List<TaskBlock> taskBlocks = new List<TaskBlock>();
 
+    public GameObject arrowPrefab;
+    public GameObject arrowParent;
+
     public List<TaskBlock> selectedBlocks = new List<TaskBlock>();
 
     public bool editing = false;
@@ -132,6 +135,13 @@ public class UIManager : MonoBehaviour
             }
         }
     }
+
+    public Arrow createArrow()
+    {
+        GameObject arrowObject = Instantiate(arrowPrefab, arrowParent.transform);
+        return arrowObject.GetComponent<Arrow>();
+    }
+
     private List<TaskBlock> createChildTaskBlocks(Selector parent, int level)
     {
         List<TaskBlock> output = new List<TaskBlock>();

@@ -28,6 +28,9 @@ public class TaskBlock : MonoBehaviour
 
     public TextAsset sceneInfo;
 
+    public UIManager um;
+    public List<Arrow> arrows;
+
     private bool initialized = false;
 
     public void Initialize(int taskID, Task.TaskType taskType, bool inverted, string kinematic, string target, string condition, string action, List<TaskBlock> children)
@@ -121,6 +124,13 @@ public class TaskBlock : MonoBehaviour
     public void actionSelect()
     {
         action = actionDropdown.options[actionDropdown.value].text;
+    }
+
+    private void createArrow(TaskBlock target)
+    {
+        Arrow arrow = um.createArrow();
+        // Raycast to target to get exact end point
+        //arrow.setPoints(childrenBox.transform.position, );
     }
 
     private void fillKinematicOptions()
