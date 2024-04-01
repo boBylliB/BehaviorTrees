@@ -140,7 +140,8 @@ public class TaskBlock : MonoBehaviour
             if (Input.GetMouseButtonUp(0))
             {
                 movingArrow = false;
-                Destroy(tempArrow);
+                Destroy(tempArrow.gameObject);
+                tempArrow = null;
                 if (um.selectedBlock != null)
                 {
                     if (children.Contains(um.selectedBlock))
@@ -150,6 +151,15 @@ public class TaskBlock : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void remove()
+    {
+        if (parent != null)
+            parent.children.Remove(this);
+        foreach (Arrow arrow in arrows)
+            Destroy(arrow.gameObject);
+        um.deleteBlock(this);
     }
     
     public void triggerSelect()
@@ -198,7 +208,10 @@ public class TaskBlock : MonoBehaviour
     private void updateArrows()
     {
         while (arrows.Count > children.Count)
+        {
+            Destroy(arrows[arrows.Count - 1]);
             arrows.RemoveAt(arrows.Count - 1);
+        }
         while (arrows.Count < children.Count)
             arrows.Add(um.createArrow());
         arrowsOutOfDate = false;

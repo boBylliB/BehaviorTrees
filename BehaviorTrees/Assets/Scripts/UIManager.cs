@@ -68,6 +68,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void deleteBlock(TaskBlock block)
+    {
+        removeFromSelectedBlocks(block);
+        taskBlocks.Remove(block);
+        Destroy(block.gameObject);
+    }
+
     public void addToSelectedBlocks(TaskBlock block)
     {
         selectedBlocks.Add(block);
@@ -120,24 +127,29 @@ public class UIManager : MonoBehaviour
     private Task convertBlockToTask(TaskBlock block, List<TaskBlock> used)
     {
         List<Task> children;
+        Debug.Log($"Task: {block.typeLabel.text}");
         switch (block.taskType)
         {
             case Task.TaskType.Selector:
                 children = new List<Task>();
+                Debug.Log("Enter level");
                 foreach (TaskBlock childBlock in block.children)
                 {
                     children.Add(convertBlockToTask(childBlock, used));
                     used.Add(childBlock);
                 }
+                Debug.Log("Exit Level");
                 Selector sel = new Selector(children, block.inverted);
                 return sel;
             case Task.TaskType.Sequence:
                 children = new List<Task>();
+                Debug.Log("Enter level");
                 foreach (TaskBlock childBlock in block.children)
                 {
                     children.Add(convertBlockToTask(childBlock, used));
                     used.Add(childBlock);
                 }
+                Debug.Log("Exit Level");
                 Sequence seq = new Sequence(children, block.inverted);
                 return seq;
             case Task.TaskType.Conditional:
