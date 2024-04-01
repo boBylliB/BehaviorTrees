@@ -24,6 +24,11 @@ Action
 - Calls a function to interact with something
 - No children
 - Needs the name of the gameobject to interact with and the name of the action to perform
+Movement
+- Sets a kinematic's target to a given target, and returns success once reaching the target
+- No children
+- Needs the name of the gameobject to move and the name of the gameobject to target
+- Can optionally specify the threshold distance, check delay, and timeout period
 
 === Task Editor ===
 Tasks are represented by little icons connected by arrows

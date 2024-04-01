@@ -25,9 +25,14 @@ public class BruceBanner : Kinematic
         myMoveType = new Arrive();
         myMoveType.character = this;
         myMoveType.target = exterior;
+        myTarget = exterior;
     }
     protected override void Update()
     {
+        // Check for external target update
+        if (myTarget != myMoveType.target)
+            myMoveType.target = myTarget;
+
         if (!running && Input.GetKeyDown("g"))
         {
             running = true;

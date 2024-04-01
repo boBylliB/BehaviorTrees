@@ -455,7 +455,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Better Behavior Trees
+  m_Text: Task Editor
 --- !u!222 &532263947
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -627,7 +627,7 @@ GameObject:
   - component: {fileID: 1632606566}
   - component: {fileID: 1632606565}
   m_Layer: 5
-  m_Name: BetterBehaviorTrees
+  m_Name: TaskEditor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

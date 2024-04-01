@@ -31,36 +31,38 @@ public class TaskList : MonoBehaviour
     {
         if (xelem.Name == "sequence")
         {
-            Sequence seq = new Sequence();
-            seq.children = new List<Task>();
+            List<Task> children = new List<Task>();
             foreach (XElement child in xelem.Elements())
-                seq.children.Add(readTask(child));
+                children.Add(readTask(child));
+            Sequence seq = new Sequence(children, xelem.Get("invert",false));
             return seq;
         }
         else if (xelem.Name == "selector")
         {
-            Selector sel = new Selector();
-            sel.children = new List<Task>();
+            List<Task> children = new List<Task>();
             foreach (XElement child in xelem.Elements())
-                sel.children.Add(readTask(child));
+                children.Add(readTask(child));
+            Selector sel = new Selector(children, xelem.Get("invert", false));
             return sel;
         }
         else if (xelem.Name == "conditional")
         {
-            Conditional con = new Conditional();
-            con.invert = xelem.Get("invert", false);
-            con.defaultValue = xelem.Get("default", false);
-            con.key = xelem.Get<string>("condition");
-            con.target = GameObject.Find(xelem.Get<string>("gameobject")).GetComponent<TaskInterface>();
+            Conditional con = new Conditional(GameObject.Find(xelem.Get<string>("gameobject")).GetComponent<TaskInterface>(),
+                                              xelem.Get<string>("condition"), xelem.Get("invert", false), xelem.Get("default", false));
             return con;
         }
         else if (xelem.Name == "action")
         {
-            Action act = new Action();
-            act.invert = xelem.Get("invert", false);
-            act.key = xelem.Get<string>("action");
-            act.target = GameObject.Find(xelem.Get<string>("gameobject")).GetComponent<TaskInterface>();
+            Action act = new Action(GameObject.Find(xelem.Get<string>("gameobject")).GetComponent<TaskInterface>(),
+                                    xelem.Get<string>("action"), xelem.Get("invert", false));
             return act;
+        }
+        else if (xelem.Name == "movement")
+        {
+            Movement mov = new Movement(GameObject.Find(xelem.Get<string>("gameobject")).GetComponent<Kinematic>(),
+                                        GameObject.Find(xelem.Get<string>("target")), xelem.Get("invert", false),
+                                        xelem.Get("threshold", 1.5f), xelem.Get("checkdelay", 0.1f), xelem.Get("timeout", 10f));
+            return mov;
         }
         else
         {

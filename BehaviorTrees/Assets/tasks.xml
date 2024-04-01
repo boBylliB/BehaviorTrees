@@ -2,10 +2,10 @@
   <selector>
     <sequence>
       <conditional gameobject="Door" condition="open"/>
-      <action gameobject="BruceBanner" action="moveIntoRoom"/>
+      <movement gameobject="BruceBanner" target="Interior"/>
     </sequence>
     <sequence>
-      <action gameobject="BruceBanner" action="moveToDoor"/>
+      <movement gameobject="BruceBanner" target="FrontOfDoor"/>
       <selector>
         <sequence>
           <conditional gameobject="Door" condition="locked" invert="True"/>
@@ -15,7 +15,7 @@
           <action gameobject="Door" action="barge"/>
         </sequence>
       </selector>
-      <action gameobject="BruceBanner" action="moveIntoRoom"/>
+      <movement gameobject="BruceBanner" target="Interior"/>
     </sequence>
   </selector>
 </tasks>
